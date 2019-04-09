@@ -17,11 +17,7 @@ var app = (function () {
         ctx.stroke();
     };
 
-    var sendPointToCanvas= function(point){
-        var canvas = document.getElementById("canvas");
-        var ctx = canvas.getContext("2d");
 
-    }
     
     
     var getMousePosition = function (evt) {
@@ -32,6 +28,12 @@ var app = (function () {
             y: evt.clientY - rect.top
         };
     };
+    var myscript=function(event){
+        var pos=getMousePosition(event);
+        var pt =new Point(pos.x,pos.y);
+        stompClient.send("/topic/newpoint", {}, JSON.stringify(pt)); 
+
+    }
 
 
     var connectAndSubscribe = function () {
@@ -58,6 +60,7 @@ var app = (function () {
 
         init: function () {
             var can = document.getElementById("canvas");
+            can.addEventListener('mousedown',myscript);
             
             //websocket connection
             connectAndSubscribe();
@@ -66,8 +69,9 @@ var app = (function () {
         publishPoint: function(px,py){
             var pt=new Point(px,py);
             console.info("publishing point at "+pt);
+           
             addPointToCanvas(pt);
-            stompClient.send("/topic/newpoint", {}, JSON.stringify(pt)); 
+           
             //publicar el evento
            
         },
