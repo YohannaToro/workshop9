@@ -6,7 +6,7 @@ var app = (function () {
             this.y=y;
         }        
     }
-    
+    var id=null;
     var stompClient = null;
 
     var addPointToCanvas = function (point) {        
@@ -31,7 +31,8 @@ var app = (function () {
     var myscript=function(event){
         var pos=getMousePosition(event);
         var pt =new Point(pos.x,pos.y);
-        stompClient.send("/topic/newpoint", {}, JSON.stringify(pt)); 
+        console.log("este es el id de ese tablero"+id);
+        stompClient.send("/topic/newpoint."+id, {}, JSON.stringify(pt)); 
 
     }
 
@@ -44,8 +45,8 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/newpoint', function (eventbody) {
-                alert(eventbody.body)
+        stompClient.subscribe('/topic/newpoint.'+id, function (eventbody) {
+                //alert(eventbody.body)
                 var theObject=JSON.parse(eventbody.body);
                 addPointToCanvas(theObject);
                 
@@ -59,10 +60,17 @@ var app = (function () {
     return {
 
         init: function () {
+            
             var can = document.getElementById("canvas");
             can.addEventListener('mousedown',myscript);
             
             //websocket connection
+
+            //connectAndSubscribe();
+        },
+        websocketConnection: function(idTablero){
+            console.log("hola  amigos "+idTablero);
+             id=idTablero;
             connectAndSubscribe();
         },
 
